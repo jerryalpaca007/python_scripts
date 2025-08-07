@@ -1,5 +1,5 @@
 fyl=open('School.txt','w+')
-fyl.write('A school is an educational institution designed to provide learning spacesand learning environments for the teaching of students under the directionof teachers.')
+fyl.write('A school is an Educational institution designed to provide learning spacesand learning environments for the teaching of students under the directionof teachers.')
 fyl.close()
 
 fol=open('School.txt','r')
