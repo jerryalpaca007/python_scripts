@@ -26,4 +26,4 @@ f=open("MYSCHOOL.txt","w")
 f.writelines(li)
 f.close()
 
-print(  )
+print()
