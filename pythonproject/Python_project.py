@@ -23,7 +23,106 @@ sql1 = mysql.connector.connect(host='localhost', username='root', password='hell
 sql2 = mysql.connector.connect(host='localhost', username='root', password='helloworld', database='customer_data')
 cur1 = sql1.cursor()
 cur2 = sql2.cursor()
-#cur1.execute('ALTER TABLE Car_details ADD COLUMN image_path VARCHAR(255);')
+
+
+
+'''# ------------------ DEFAULT DATA ------------------
+car_data = [
+    (1, 'Civic', 'Honda', 2020, 'Petrol', 'Automatic', 'White'),
+    (2, 'Model 3', 'Tesla', 2022, 'Electric', 'Automatic', 'Red'),
+    (3, 'Corolla', 'Toyota', 2019, 'Diesel', 'Manual', 'Silver'),
+    (4, 'Mustang', 'Ford', 2021, 'Petrol', 'Automatic', 'Yellow'),
+    (5, 'Creta', 'Hyundai', 2023, 'Diesel', 'Manual', 'Black'),
+    (6, 'Swift', 'Suzuki', 2018, 'Petrol', 'Manual', 'Blue'),
+    (7, 'Fortuner', 'Toyota', 2022, 'Diesel', 'Automatic', 'Grey'),
+    (8, 'City', 'Honda', 2021, 'Petrol', 'CVT', 'Red'),
+    (9, 'i20', 'Hyundai', 2020, 'Petrol', 'Manual', 'Blue'),
+    (10, 'Compass', 'Jeep', 2021, 'Diesel', 'Automatic', 'Black'),
+    (11, 'Seltos', 'Kia', 2022, 'Petrol', 'CVT', 'White'),
+    (12, 'Altroz', 'Tata', 2023, 'Petrol', 'Manual', 'Grey'),
+    (13, 'XUV700', 'Mahindra', 2022, 'Diesel', 'Automatic', 'Silver'),
+    (14, 'Baleno', 'Suzuki', 2021, 'Petrol', 'Automatic', 'Blue'),
+    (15, 'Venue', 'Hyundai', 2020, 'Petrol', 'Manual', 'Grey'),
+    (16, 'Sonet', 'Kia', 2023, 'Diesel', 'Automatic', 'Red'),
+    (17, 'Thar', 'Mahindra', 2021, 'Diesel', 'Manual', 'Black'),
+    (18, 'A-Class', 'Mercedes', 2022, 'Petrol', 'Automatic', 'White'),
+    (19, 'Q3', 'Audi', 2023, 'Petrol', 'Automatic', 'Blue'),
+    (20, 'Kushaq', 'Skoda', 2023, 'Petrol', 'Manual', 'Orange')
+]
+
+query_car = """
+INSERT INTO Car_details (car_id, car_name, brand, model_year, fuel_type, transmission, color)
+VALUES (%s, %s, %s, %s, %s, %s, %s)
+"""
+
+car_status_data = [
+    (1, 'Available', 22000, 'Excellent'),
+    (2, 'Sold', 10000, 'New'),
+    (3, 'Available', 35000, 'Good'),
+    (4, 'Available', 15000, 'Excellent'),
+    (5, 'Available', 5000, 'New'),
+    (6, 'Sold', 45000, 'Fair'),
+    (7, 'Available', 12000, 'Excellent'),
+    (8, 'Available', 18000, 'Good'),
+    (9, 'Sold', 30000, 'Fair'),
+    (10, 'Available', 14000, 'Excellent'),
+    (11, 'Available', 8000, 'Excellent'),
+    (12, 'Available', 2000, 'New'),
+    (13, 'Available', 9000, 'Excellent'),
+    (14, 'Sold', 25000, 'Good'),
+    (15, 'Available', 10000, 'Good'),
+    (16, 'Available', 5000, 'New'),
+    (17, 'Available', 11000, 'Excellent'),
+    (18, 'Sold', 8000, 'Excellent'),
+    (19, 'Available', 3000, 'New'),
+    (20, 'Available', 7000, 'New')
+]
+
+query_status = """
+INSERT INTO Car_status (car_id, availability, mileage, condition_status)
+VALUES (%s, %s, %s, %s)
+"""
+
+car_specification_data = [
+    (1, 1800, 140, 174, 5),
+    (2, 0, 283, 350, 5),
+    (3, 1600, 120, 150, 5),
+    (4, 5000, 450, 530, 4),
+    (5, 1493, 113, 250, 5),
+    (6, 1200, 83, 113, 5),
+    (7, 2755, 204, 420, 7),
+    (8, 1498, 121, 145, 5),
+    (9, 1197, 83, 115, 5),
+    (10, 1956, 170, 350, 5),
+    (11, 1497, 113, 144, 5),
+    (12, 1199, 85, 113, 5),
+    (13, 2198, 182, 420, 7),
+    (14, 1197, 88, 113, 5),
+    (15, 1493, 118, 250, 5),
+    (16, 1493, 115, 250, 5),
+    (17, 2184, 130, 300, 4),
+    (18, 1332, 163, 250, 5),
+    (19, 1984, 190, 320, 5),
+    (20, 1498, 150, 250, 5)
+]
+
+query_spec = """
+INSERT INTO Car_specification (car_id, engine_cc, horsepower, torque, seating_capacity)
+VALUES (%s, %s, %s, %s, %s)
+"""
+'''
+
+# ------------------ FUNCTION TO ADD DEFAULT DATA ------------------
+def insert_default_data():
+    try:
+        cur1.executemany(query_car, car_data)
+        cur1.executemany(query_status, car_status_data)
+        cur1.executemany(query_spec, car_specification_data)
+        sql1.commit()
+        messagebox.showinfo("Success", "Default car details added successfully!")
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to insert data:\n{e}")
+
 # ---------- TABLE CREATION ----------
 try:
     cur1.execute("""
@@ -34,8 +133,7 @@ try:
         model_year INT,
         fuel_type VARCHAR(20),
         transmission VARCHAR(20),
-        color VARCHAR(20),
-        image_path VARCHAR(255)
+        color VARCHAR(20)
     );
     """)
 except Exception as e:
@@ -66,7 +164,6 @@ try:
         horsepower INT,
         torque INT,
         seating_capacity INT,
-        color VARCHAR(20),
         FOREIGN KEY (car_id) REFERENCES Car_details(car_id)
             ON DELETE CASCADE
             ON UPDATE CASCADE
@@ -134,238 +231,80 @@ try:
 except Exception as e:
     print("Error creating Customer_login table:", e)
 
-#-------------Car values to be inserted-----------------
-query = """
-INSERT INTO Car_details (car_name, brand, model_year, fuel_type, transmission, color, image_path)
-VALUES (%s, %s, %s, %s, %s, %s, %s)
-"""
-values = ('Civic', 'Honda', 2020, 'Petrol', 'Automatic', 'White', 'C:/Users/ajdks/Documents/python_scripts/pythonproject/Pictures/Civic.jpg')
-
-cur1.execute(query, values)
-
 # ---------- DEFAULT LOGIN ----------
 cur2.execute("SELECT * FROM Customer_login")
 if not cur2.fetchall():
     cur2.execute("INSERT INTO Customer_login (username, password_hash) VALUES ('admin', '1234')")
     sql2.commit()
 
-# ==========================================================
-#   VIEW CAR DETAILS SCREEN
-# ==========================================================
 
-def open_car_details_screen(car_id):
-    details_window = tk.Toplevel(root)
-    details_window.title("Car Full Details")
-    details_window.geometry("650x700")
-    details_window.config(bg="#f5f5f5")
+# ------------------ DEFAULT CAR DATA ------------------
 
-    tk.Label(details_window, text="Car Details", font=("Arial", 18, "bold"), bg="#f5f5f5").pack(pady=10)
+car_data = [
+    (1, 'Civic', 'Honda', 2020, 'Petrol', 'Automatic', 'White'),
+    (2, 'Model 3', 'Tesla', 2022, 'Electric', 'Automatic', 'Red'),
+    (3, 'Corolla', 'Toyota', 2019, 'Diesel', 'Manual', 'Silver'),
+    (4, 'Mustang', 'Ford', 2021, 'Petrol', 'Automatic', 'Yellow'),
+    (5, 'Creta', 'Hyundai', 2023, 'Diesel', 'Manual', 'Black'),
+    (6, 'Swift', 'Suzuki', 2018, 'Petrol', 'Manual', 'Blue'),
+    (7, 'Fortuner', 'Toyota', 2022, 'Diesel', 'Automatic', 'Grey'),
+    (8, 'City', 'Honda', 2021, 'Petrol', 'CVT', 'Red'),
+    (9, 'i20', 'Hyundai', 2020, 'Petrol', 'Manual', 'Blue'),
+    (10, 'Compass', 'Jeep', 2021, 'Diesel', 'Automatic', 'Black'),
+]
 
+car_status_data = [
+    (1, 'Available', 22000, 'Excellent'),
+    (2, 'Sold', 10000, 'New'),
+    (3, 'Available', 35000, 'Good'),
+    (4, 'Available', 15000, 'Excellent'),
+    (5, 'Available', 5000, 'New'),
+    (6, 'Sold', 45000, 'Fair'),
+    (7, 'Available', 12000, 'Excellent'),
+    (8, 'Available', 18000, 'Good'),
+    (9, 'Sold', 30000, 'Fair'),
+    (10, 'Available', 14000, 'Excellent'),
+]
+
+car_specification_data = [
+    (1, 1800, 140, 174, 5),
+    (2, 0, 283, 350, 5),
+    (3, 1600, 120, 150, 5),
+    (4, 5000, 450, 530, 4),
+    (5, 1493, 113, 250, 5),
+    (6, 1200, 83, 113, 5),
+    (7, 2755, 204, 420, 7),
+    (8, 1498, 121, 145, 5),
+    (9, 1197, 83, 115, 5),
+    (10, 1956, 170, 350, 5),
+]
+
+# ------------------ INSERT DEFAULT DATA ------------------
+
+def insert_default_data():
     try:
-        # Fetch data from all related tables
-        cur1.execute("SELECT * FROM Car_details WHERE car_id = %s", (car_id,))
-        car_info = cur1.fetchone()
+        cur1.executemany("""
+            INSERT INTO Car_details (car_id, car_name, brand, model_year, fuel_type, transmission, color)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, car_data)
 
-        cur1.execute("SELECT * FROM Car_status WHERE car_id = %s", (car_id,))
-        status_info = cur1.fetchone()
+        cur1.executemany("""
+            INSERT INTO Car_status (car_id, availability, mileage, condition_status)
+            VALUES (%s, %s, %s, %s)
+        """, car_status_data)
 
-        cur1.execute("SELECT * FROM Car_specification WHERE car_id = %s", (car_id,))
-        spec_info = cur1.fetchone()
+        cur1.executemany("""
+            INSERT INTO Car_specification (car_id, engine_cc, horsepower, torque, seating_capacity)
+            VALUES (%s, %s, %s, %s, %s)
+        """, car_specification_data)
 
-        cur1.execute("SELECT * FROM Car_price WHERE car_id = %s", (car_id,))
-        price_info = cur1.fetchone()
-
-        cur1.execute("SELECT * FROM Car_owner_history WHERE car_id = %s", (car_id,))
-        owner_info = cur1.fetchone()
-
-        # --- Display Image (if available) ---
-        image_frame = tk.Frame(details_window, bg="#f5f5f5")
-        image_frame.pack(pady=10)
-
-        if car_info and len(car_info) > 7:
-            image_path = car_info[7]
-            if image_path and os.path.exists(image_path):
-                try:
-                    img = Image.open(image_path)
-                    img = img.resize((350, 250))
-                    photo = ImageTk.PhotoImage(img)
-                    img_label = tk.Label(image_frame, image=photo, bg="#f5f5f5")
-                    img_label.image = photo  # Prevent garbage collection
-                    img_label.pack()
-                except Exception as e:
-                    tk.Label(image_frame, text=f"Image could not be loaded: {e}", fg="red", bg="#f5f5f5").pack()
-            else:
-                tk.Label(image_frame, text="Image not found", fg="red", bg="#f5f5f5").pack()
-
-        # --- Allow user to upload or change the image ---
-        def upload_image():
-            file_path = filedialog.askopenfilename(
-                title="Select Car Image",
-                filetypes=[("Image Files", "*.jpg *.jpeg *.png")]
-            )
-            if file_path:
-                file_path = file_path.replace("\\", "/")  # Normalize slashes
-                try:
-                    cur1.execute("UPDATE Car_details SET image_path=%s WHERE car_id=%s", (file_path, car_id))
-                    sql1.commit()
-                    messagebox.showinfo("Success", "Image updated successfully!")
-                    details_window.destroy()
-                    open_car_details_screen(car_id)  # Refresh window
-                except Exception as e:
-                    messagebox.showerror("Error", f"Failed to update image:\n{e}")
-
-        tk.Button(details_window, text="Upload New Image", command=upload_image,
-                  bg="green", fg="white").pack(pady=5)
-
-        # --- Combine all text details ---
-        text_box = tk.Text(details_window, wrap=tk.WORD, font=("Arial", 12),
-                           bg="white", height=25, width=70)
-        text_box.pack(padx=10, pady=10)
-
-        display_text = ""
-
-        if car_info:
-            display_text += f"--- Car Information ---\n"
-            display_text += f"Car ID: {car_info[0]}\nName: {car_info[1]}\nBrand: {car_info[2]}\n"
-            display_text += f"Model Year: {car_info[3]}\nFuel Type: {car_info[4]}\n"
-            display_text += f"Transmission: {car_info[5]}\nColor: {car_info[6]}\n\n"
-
-        if status_info:
-            display_text += f"--- Status ---\nAvailability: {status_info[2]}\n"
-            display_text += f"Mileage: {status_info[3]} km\nCondition: {status_info[4]}\n\n"
-
-        if spec_info:
-            display_text += f"--- Specifications ---\nEngine: {spec_info[2]} cc\nHorsepower: {spec_info[3]} HP\n"
-            display_text += f"Torque: {spec_info[4]} Nm\nSeating: {spec_info[5]}\nColor: {spec_info[6]}\n\n"
-
-        if price_info:
-            display_text += f"--- Price ---\nOn-road Price: {price_info[2]} {price_info[3]}\n"
-            display_text += f"Listing Price: {price_info[4]} {price_info[3]}\n\n"
-
-        if owner_info:
-            display_text += f"--- Owner History ---\nPrevious Owners: {owner_info[2]}\n"
-            display_text += f"Last Owner: {owner_info[3]}\nOwnership Type: {owner_info[4]}\n"
-            display_text += f"Ownership Hand: {owner_info[5]}\n\n"
-
-        if not any([car_info, status_info, spec_info, price_info, owner_info]):
-            display_text = "No additional details found for this car."
-
-        text_box.insert(tk.END, display_text)
-        text_box.config(state="disabled")
-
-        tk.Button(details_window, text="Close", command=details_window.destroy,
-                  bg="red", fg="white").pack(pady=10)
-
+        sql1.commit()
+        messagebox.showinfo("Success", "Default car details added successfully!")
     except Exception as e:
-        messagebox.showerror("Error", f"Failed to fetch car details:\n{e}")
+        messagebox.showerror("Error", f"Failed to insert data:\n{e}")
 
 # ==========================================================
-#   FUNCTIONS FOR ADD CAR AND SEARCH CAR
-# ==========================================================
-
-def open_add_car_form(root_window):
-    """Opens the Add Car Details form"""
-    for widget in root_window.winfo_children():
-        widget.destroy()
-
-    root_window.title("Add Car Details")
-    tk.Label(root_window, text="Add Car Details", font=("Arial", 16, "bold")).pack(pady=10)
-
-    # Tkinter Variables
-    car_name_var = tk.StringVar()
-    brand_var = tk.StringVar()
-    model_year_var = tk.StringVar()
-    fuel_type_var = tk.StringVar()
-    transmission_var = tk.StringVar()
-    color_var = tk.StringVar()
-
-    def add_car_details():
-        try:
-            cur1.execute(
-                "INSERT INTO Car_details (car_name, brand, model_year, fuel_type, transmission, color) "
-                "VALUES (%s, %s, %s, %s, %s, %s)",
-                (car_name_var.get(), brand_var.get(), int(model_year_var.get()), fuel_type_var.get(),
-                 transmission_var.get(), color_var.get())
-            )
-            sql1.commit()
-            messagebox.showinfo("Success", "Car details added successfully!")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error adding car details:\n{e}")
-
-    entries = [
-        ("Car Name", car_name_var),
-        ("Brand", brand_var),
-        ("Model Year", model_year_var),
-        ("Fuel Type", fuel_type_var),
-        ("Transmission", transmission_var),
-        ("Color", color_var)
-    ]
-
-    for label, var in entries:
-        tk.Label(root_window, text=label).pack()
-        tk.Entry(root_window, textvariable=var).pack()
-
-    tk.Button(root_window, text="Add Car Details", command=add_car_details,
-              bg="green", fg="white").pack(pady=15)
-    tk.Button(root_window, text="Back to Menu", command=lambda: show_menu_screen()).pack(pady=5)
-
-# ----------------------------------------------------------
-
-def open_search_car_form(root_window):
-    """Opens the Search Car Details screen"""
-    for widget in root_window.winfo_children():
-        widget.destroy()
-
-    root_window.title("Search Car Details")
-    tk.Label(root_window, text="Search Car Details", font=("Arial", 16, "bold")).pack(pady=10)
-
-    search_var = tk.StringVar()
-
-    tk.Label(root_window, text="Search by Car Name or Brand:").pack()
-    tk.Entry(root_window, textvariable=search_var, width=40).pack(pady=5)
-
-    columns = ("Car ID", "Car Name", "Brand", "Model Year", "Fuel Type", "Transmission", "Color")
-    tree = ttk.Treeview(root_window, columns=columns, show="headings")
-    for col in columns:
-        tree.heading(col, text=col)
-        tree.column(col, width=100)
-    tree.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
-
-    tk.Button(root_window, text="View Selected Car Details", bg="purple", fg="white",
-          command=lambda: view_selected_car()).pack(pady=5)
-
-    def view_selected_car():
-        selected = tree.selection()
-        if not selected:
-            messagebox.showwarning("No Selection", "Please select a car from the list.")
-            return
-        car_data = tree.item(selected[0], 'values')
-        car_id = car_data[0]
-        open_car_details_screen(car_id)
-
-    def search_car():
-        try:
-            cur1.execute("SELECT * FROM Car_details WHERE car_name LIKE %s OR brand LIKE %s",
-                         (f"%{search_var.get()}%", f"%{search_var.get()}%"))
-            results = cur1.fetchall()
-
-            for row in tree.get_children():
-                tree.delete(row)
-            for row in results:
-                tree.insert("", tk.END, values=row)
-
-            if not results:
-                messagebox.showinfo("No Results", "No cars found matching your search.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error searching cars:\n{e}")
-
-    tk.Button(root_window, text="Search", command=search_car, bg="blue", fg="white").pack(pady=5)
-    tk.Button(root_window, text="Back to Menu", command=lambda: show_menu_screen()).pack(pady=5)
-
-
-
-# ==========================================================
-#   LOGIN / REGISTER / MENU SCREENS
+#   GUI SECTION
 # ==========================================================
 
 root = tk.Tk()
@@ -376,6 +315,7 @@ def clear_root():
         widget.destroy()
 
 # --- LOGIN SCREEN ---
+
 def show_login_screen():
     clear_root()
     root.title("Login")
@@ -385,9 +325,12 @@ def show_login_screen():
     password_var = tk.StringVar()
 
     tk.Label(root, text="Username").pack()
-    tk.Entry(root, textvariable=username_var).pack(pady=5)
+    username_entry = tk.Entry(root, textvariable=username_var)
+    username_entry.pack(pady=5)
+
     tk.Label(root, text="Password").pack()
-    tk.Entry(root, textvariable=password_var, show="*").pack(pady=5)
+    password_entry = tk.Entry(root, textvariable=password_var, show="*")
+    password_entry.pack(pady=5)
 
     def login_action():
         cur2.execute("SELECT * FROM Customer_login WHERE username=%s AND password_hash=%s",
@@ -401,8 +344,8 @@ def show_login_screen():
     def open_register_screen():
         clear_root()
         root.title("Register")
-
         tk.Label(root, text="Register New User", font=("Arial", 18, "bold")).pack(pady=20)
+
         new_user_var = tk.StringVar()
         new_pass_var = tk.StringVar()
 
@@ -427,7 +370,11 @@ def show_login_screen():
     tk.Button(root, text="Login", bg="green", fg="white", width=15, command=login_action).pack(pady=15)
     tk.Button(root, text="Register New User", bg="blue", fg="white", width=15, command=open_register_screen).pack()
 
+    # ✅ Ensure focus is set after everything loads
+    root.after(100, lambda: username_entry.focus_set())
+
 # --- MENU SCREEN ---
+
 def show_menu_screen():
     clear_root()
     root.title("Main Menu")
@@ -440,24 +387,96 @@ def show_menu_screen():
     tk.Button(root, text="Logout", width=20, height=2, bg="red", fg="white",
               command=show_login_screen).pack(pady=30)
 
-# --- Start App ---
-show_login_screen()
+# --- ADD & SEARCH FUNCTIONS ---
+
+def open_search_car_form(root_window):
+    clear_root()
+    root_window.title("Search Car Details")
+    tk.Label(root_window, text="Search Car Details", font=("Arial", 16, "bold")).pack(pady=10)
+
+    search_var = tk.StringVar()
+    search_entry = tk.Entry(root_window, textvariable=search_var, width=40)
+    search_entry.pack(pady=5)
+
+    columns = ("Car ID", "Car Name", "Brand", "Model Year", "Fuel Type", "Transmission", "Color")
+    tree = ttk.Treeview(root_window, columns=columns, show="headings", height=10)
+    for col in columns:
+        tree.heading(col, text=col)
+        tree.column(col, width=85)
+    tree.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
+
+   
+    def perform_search(event=None):
+        query_text = search_var.get().strip()
+        if len(query_text) >= 3:
+            try:
+                cur1.execute(
+                    "SELECT * FROM Car_details WHERE car_name LIKE %s OR brand LIKE %s",
+                    (f"%{query_text}%", f"%{query_text}%")
+                )
+                results = cur1.fetchall()
+                tree.delete(*tree.get_children())
+                for row in results:
+                    tree.insert("", tk.END, values=row)
+                if not results:
+                    tree.insert("", tk.END, values=("No cars found", "", "", "", "", "", ""))
+            except Exception as e:
+                messagebox.showerror("Error", f"Error searching cars:\n{e}")
+        else:
+            tree.delete(*tree.get_children())
+    search_entry.bind("<KeyRelease>", perform_search)
+    
+    def view_selected_car():
+        selected = tree.selection()
+        if not selected:
+            messagebox.showwarning("No Selection", "Please select a car from the list.")
+            return
+        car_data = tree.item(selected[0], 'values')
+        open_car_details_screen(car_data[0])
+
+    tk.Button(root_window, text="View Selected Car", bg="orange", fg="white", command=view_selected_car).pack(pady=5)
+    tk.Button(root_window, text="Back to Menu", command=show_menu_screen).pack(pady=5)
+
+# --- CAR DETAILS SCREEN ---
+
+def open_car_details_screen(car_id):
+    details_window = tk.Toplevel(root)
+    details_window.title("Car Full Details")
+    details_window.geometry("550x450")
+    details_window.config(bg="#f5f5f5")
+
+    try:
+        cur1.execute("SELECT * FROM Car_details WHERE car_id = %s", (car_id,))
+        car = cur1.fetchone()
+        if not car:
+            messagebox.showerror("Error", "Car not found.")
+            return
+
+        tk.Label(details_window, text="Car Details", font=("Arial", 18, "bold"), bg="#f5f5f5").pack(pady=10)
+        labels = ["Car ID", "Car Name", "Brand", "Model Year", "Fuel Type", "Transmission", "Color"]
+        for i, label in enumerate(labels):
+            tk.Label(details_window, text=f"{label}: {car[i]}", bg="#f5f5f5").pack(anchor="w", padx=20)
+
+        def show_status():
+            cur1.execute("SELECT availability, mileage, condition_status FROM Car_status WHERE car_id=%s", (car_id,))
+            st = cur1.fetchone()
+            if st:
+                messagebox.showinfo("Car Status", f"Availability: {st[0]}\nMileage: {st[1]} km\nCondition: {st[2]}")
+            else:
+                messagebox.showwarning("No Status", "No status record found.")
+
+        tk.Button(details_window, text="View Car Status", bg="#0078D7", fg="white", command=show_status).pack(pady=15)
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Database error:\n{e}")
+
+# --- STARTUP ---
+
+def start_app():
+    ans = messagebox.askyesno("Add Default Data", "Would you like to add the default car details?")
+    if ans:
+        insert_default_data()
+    show_login_screen()
+
+start_app()
 root.mainloop()
-
-from tkinter import filedialog
-from PIL import Image, ImageTk  # make sure Pillow is installed: pip install pillow
-
-image_path_var = tk.StringVar()
-
-def select_image():
-    file_path = filedialog.askopenfilename(
-        title="Select Car Image",
-        filetypes=[("Image Files", "*.jpg *.jpeg *.png *.gif")]
-    )
-    if file_path:
-        image_path_var.set(file_path)
-        messagebox.showinfo("Image Selected", f"Image chosen:\n{file_path}")
-
-# Add an image selector field
-tk.Label(root, text="Car Image").pack()
-tk.Button(root, text="Select Image", command=select_image).pack(pady=5)
