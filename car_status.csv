@@ -1,0 +1,12 @@
+Car ID,Availability,Mileage,Condition
+1,Available,22000,Excellent
+2,Sold,10000,New
+3,Available,35000,Good
+4,Available,15000,Excellent
+5,Available,5000,New
+6,Sold,45000,Fair
+7,Available,12000,Excellent
+8,Available,18000,Good
+9,Sold,30000,Fair
+10,Available,14000,Excellent
+31,,,
