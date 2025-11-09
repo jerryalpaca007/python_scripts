@@ -3,9 +3,7 @@ from tkinter import ttk, messagebox
 import csv
 import os
 
-# ============================================================
-# THEME SETTINGS — MODIFY COLORS & FONTS HERE
-# ============================================================
+
 THEME = {
     "bg_main": "#8D99AE",
     "bg_banner": "#2A6DCB",
@@ -28,7 +26,6 @@ THEME = {
     "label_fg": "black",
 }
 
-# === CSV FILE PATHS ===
 CAR_DETAILS_FILE = "car_details.csv"
 CAR_STATUS_FILE = "car_status.csv"
 CAR_SPEC_FILE = "car_specifications.csv"
@@ -38,7 +35,6 @@ CAR_DAMAGE_DATA = "car_damage.csv"
 LOGIN_FILE = "login.csv"
 CAR_CRASH_FILE = "car_crash_info.csv"
 
-# --- Minimal sample data lists so initialize_csvs can run without error ---
 car_data = [
     [1, 'Mustang', 'Ford', 2023, 'Petrol', 'Manual', 'Red'],
     [2, 'Camaro', 'Chevrolet', 2022, 'Petrol', 'Automatic', 'Yellow'],
@@ -576,15 +572,13 @@ car_damage_data = [
     [91, "Crash at intersection, left fender dented"],
     [99, "Major crash, both bumpers and hood damaged"]
 ]
-# ============================================================
-# CSV HELPERS
-# ============================================================
+
+
 def create_csv_file(file_path, headers, data):
     if not os.path.exists(file_path):
         with open(file_path, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(headers)
-            # if data is list of lists, writerows; if list of dicts, convert
             if data and isinstance(data[0], dict):
                 writer.writerows([[d.get(h, "") for h in headers] for d in data])
             else:
@@ -638,9 +632,6 @@ def get_car_damage(car_id):
             return d
     return None
 
-# ============================================================
-# THEMED WIDGET HELPERS
-# ============================================================
 def create_banner(parent, text):
     frame = tk.Frame(parent, bg=THEME["bg_banner"])
     frame.pack(fill="x", pady=10)
@@ -685,9 +676,6 @@ def field(frame, label_text, widget_type="entry", options=None, entries=None, sh
     else:
         raise ValueError("Unknown widget_type for field()")
 
-# ============================================================
-# CSV INITIALIZATION & APP START
-# ============================================================
 def initialize_csvs():
     create_csv_file(CAR_DETAILS_FILE,
         ["Car ID", "Car Name", "Brand", "Model Year", "Fuel Type", "Transmission", "Color"],
@@ -718,9 +706,6 @@ def start_app():
             initialize_csvs()
     show_login_screen()
 
-# ============================================================
-# MAIN WINDOW
-# ============================================================
 root = tk.Tk()
 root.geometry("700x650")
 root.config(bg=THEME["bg_main"])
@@ -729,35 +714,28 @@ def clear_root():
     for widget in root.winfo_children():
         widget.destroy()
 
-# ============================================================
-# LOGIN / REGISTER
-# ============================================================
 def show_login_screen():
     clear_root()
     root.title("Login")
 
     create_banner(root, "Car Status / Accident Report Login")
 
-    # Create a centered frame for the form
     form_frame = tk.Frame(root, bg=THEME["bg_main"])
     form_frame.place(relx=0.5, rely=0.5, anchor="center")
 
     entries = {}
 
-    # Username field
     field(form_frame, "Username", "entry", entries=entries)
-    entries["Username"].config(justify="center")  # Center text
+    entries["Username"].config(justify="center") 
 
-    # Password field
     field(form_frame, "Password", "entry", entries=entries, show="*")
     entries["Password"].config(justify="center")
 
-    # Style all labels in white + bold
     for widget in form_frame.winfo_children():
         if isinstance(widget, tk.Label):
             widget.config(fg="white", bg=THEME["bg_main"], font=("Arial", 12, "bold"))
 
-    # --- Inner Functions ---
+  
     def login():
         users = read_csv_file(LOGIN_FILE)
         for user in users:
@@ -776,7 +754,7 @@ def show_login_screen():
         field(root, "New Username", "entry", entries=reg_entries)
         field(root, "New Password", "entry", entries=reg_entries, show="*")
 
-        # Style register labels white + bold
+       
         for widget in root.winfo_children():
             if isinstance(widget, tk.Label):
                 widget.config(fg="white", bg=THEME["bg_main"], font=("Arial", 12, "bold"))
@@ -805,7 +783,7 @@ def show_login_screen():
                   fg=THEME["btn_neutral_fg"], width=15,
                   command=show_login_screen).pack(pady=5)
 
-    # --- Buttons below form ---
+
     tk.Button(form_frame, text="Login", bg=THEME["btn_success_bg"],
               fg=THEME["btn_success_fg"], font=("Arial", 10, "bold"),
               width=15, command=login).pack(pady=10)
@@ -814,26 +792,23 @@ def show_login_screen():
               fg=THEME["btn_primary_fg"], font=("Arial", 10, "bold"),
               width=15, command=open_register_screen).pack(pady=5)
 
-# ============================================================
-# MENU SCREEN
-# ============================================================
+
 def show_menu_screen():
     clear_root()
     root.title("Main Menu")
     create_banner(root, "Car Status / Accident Report")
 
-    # --- Centered main frame for a cleaner look ---
     menu_frame = tk.Frame(root, bg=THEME["bg_main"])
     menu_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-    # --- Shared button style ---
+    
     button_style = {
         "width": 22,
         "height": 2,
         "font": ("Arial", 12, "bold")
     }
 
-    # --- Menu Buttons ---
+ 
     tk.Button(
         menu_frame, text="🔍 Search Cars",
         bg=THEME["btn_primary_bg"], fg="white",
@@ -850,7 +825,9 @@ def show_menu_screen():
         menu_frame, text="🛠️ Update Car Details",
         bg=THEME["btn_secondary_bg"], fg="white",
         **button_style, command=lambda: open_update_car_screen(root, show_menu_screen)
+
     ).pack(pady=10)
+
 
     tk.Button(
         menu_frame, text="🚪 Logout",
@@ -858,9 +835,8 @@ def show_menu_screen():
         **button_style, command=show_login_screen
     ).pack(pady=10)
 
-# ============================================================
-# ADD CAR (multi-step) with crash branch
-# ============================================================
+    
+
 def open_add_car_screen():
     clear_root()
     root.title("Add Car Details")
@@ -875,9 +851,7 @@ def open_add_car_screen():
             f.pack_forget()
         frames[name].pack(fill="both", expand=True)
 
-    # Step helper field is same as global field; we'll use it directly
 
-    # STEP 1: BASIC CAR INFO
     frame_basic = tk.Frame(root, bg=THEME["bg_main"])
     frames["basic"] = frame_basic
     create_banner(frame_basic, f"Add New Car (Vin ID: {next_car_id})")
@@ -892,12 +866,19 @@ def open_add_car_screen():
               command=lambda: show_frame("status")).pack(pady=15)
     tk.Button(frame_basic, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
 
-    # STEP 2: STATUS & TECHNICAL
+
     frame_status = tk.Frame(root, bg=THEME["bg_main"])
     frames["status"] = frame_status
     create_banner(frame_status, "Status & Technical Details")
 
-    field(frame_status, "Availability", "entry", entries=entries)
+    field(
+        frame_status,
+        "Availability",
+        "dropdown",
+        options=["Available", "Sold"],
+        entries=entries
+    )
+
     field(frame_status, "Mileage", "entry", entries=entries)
     condition_var = field(frame_status, "Condition", "dropdown", options=["Excellent", "Good", "Fair", "Poor", "Crashed"], entries=entries)
 
@@ -915,7 +896,6 @@ def open_add_car_screen():
     tk.Button(frame_status, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=lambda: show_frame("basic")).pack()
     tk.Button(frame_status, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
 
-    # CRASH DETAILS (conditional)
     frame_crash = tk.Frame(root, bg=THEME["bg_main"])
     frames["crash"] = frame_crash
     create_banner(frame_crash, "Crash Condition Details")
@@ -925,7 +905,6 @@ def open_add_car_screen():
     tk.Button(frame_crash, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=lambda: show_frame("status")).pack()
     tk.Button(frame_crash, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
 
-    # OWNER DETAILS
     frame_owner = tk.Frame(root, bg=THEME["bg_main"])
     frames["owner"] = frame_owner
     create_banner(frame_owner, "Previous Owner Details")
@@ -936,7 +915,7 @@ def open_add_car_screen():
     tk.Button(frame_owner, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=lambda: show_frame("status")).pack()
     tk.Button(frame_owner, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
 
-    # STORAGE / LOCATION
+
     frame_storage = tk.Frame(root, bg=THEME["bg_main"])
     frames["storage"] = frame_storage
     create_banner(frame_storage, "Car Storage / Location")
@@ -945,7 +924,7 @@ def open_add_car_screen():
 
     def save_car():
         car_id = next_car_id
-        # gather rows (get() for entries, for Text widget use get)
+  
         def get_val(k):
             w = entries[k]
             if isinstance(w, tk.Text):
@@ -988,10 +967,7 @@ def open_add_car_screen():
 
     show_frame("basic")
 
-# ============================================================
-# SEARCH, DETAILS POPUPS
-# ============================================================
-# --- CAR DETAILS POPUP (define this first so search can call it) ---
+
 def open_car_details_popup(car_id):
     car_id = str(car_id)
     win = tk.Toplevel(root)
@@ -1015,7 +991,7 @@ def open_car_details_popup(car_id):
              font=THEME["banner_font"], bg=THEME["bg_banner"], fg=THEME["fg_banner"],
              pady=10).pack(fill="x")
 
-    # Scrollable area
+ 
     container = tk.Frame(win, bg=THEME["bg_main"])
     container.pack(fill="both", expand=True, padx=10, pady=10)
     canvas = tk.Canvas(container, bg=THEME["bg_main"], highlightthickness=0)
@@ -1027,13 +1003,13 @@ def open_car_details_popup(car_id):
     canvas.pack(side="left", fill="both", expand=True)
     scrollbar.pack(side="right", fill="y")
 
-    # Load data
+
     status = next((s for s in read_csv_file(CAR_STATUS_FILE) if s["Car ID"] == car_id), None)
     spec = next((sp for sp in read_csv_file(CAR_SPEC_FILE) if sp["Car ID"] == car_id), None)
     owner = [o for o in read_csv_file(CAR_OWNERS_FILE) if o["Car ID"] == car_id]
     loc = next((l for l in read_csv_file(CAR_LOCATION_FILE) if l["Car ID"] == car_id), None)
 
-    # Basic Info
+
     section_title(scroll_frame, f"{details['Car Name']} — Basic Details")
     tk.Label(scroll_frame,
              text=(f"Model Year: {details.get('Model Year','')}\n"
@@ -1042,7 +1018,7 @@ def open_car_details_popup(car_id):
                    f"Color: {details.get('Color','')}"),
              bg=THEME["bg_main"], font=("Arial", 12), justify="left").pack(anchor="w", padx=20)
 
-    # Status
+
     if status:
         section_title(scroll_frame, "Status Information")
         tk.Label(scroll_frame,
@@ -1069,7 +1045,7 @@ def open_car_details_popup(car_id):
             tk.Button(scroll_frame, text="View Damage Details", bg=THEME["btn_danger_bg"],
                       fg=THEME["btn_danger_fg"], width=25, command=show_damage_details).pack(pady=10)
 
-    # Specs
+
     if spec:
         section_title(scroll_frame, "Technical Specifications")
         tk.Label(scroll_frame,
@@ -1079,7 +1055,7 @@ def open_car_details_popup(car_id):
                        f"Seating Capacity: {spec.get('Seating Capacity','')}"),
                  bg=THEME["bg_main"], font=("Arial", 12), justify="left").pack(anchor="w", padx=20)
 
-    # Owner details popup
+
     def show_owner_details():
         owner_win = tk.Toplevel(win)
         owner_win.title("Previous Owners")
@@ -1100,7 +1076,6 @@ def open_car_details_popup(car_id):
     tk.Button(scroll_frame, text="View Previous Owners", bg=THEME["bg_banner"], fg=THEME["fg_banner"],
               width=25, command=show_owner_details).pack(pady=10)
 
-    # Location popup
     def show_location():
         loc_win = tk.Toplevel(win)
         loc_win.title("Car Location")
@@ -1120,13 +1095,12 @@ def open_car_details_popup(car_id):
               command=win.destroy).pack(pady=15)
 
 
-# --- SEARCH SCREEN (now can safely call popup) ---
 def open_search_car_form(root_window):
     clear_root()
     root_window.title("Search Car Details")
     create_banner(root_window, "Search Screen")
 
-    # Search label + entry
+
     search_var = tk.StringVar()
     tk.Label(root_window, text="Search:", bg=THEME["bg_main"], fg=THEME["label_fg"]).pack(pady=(8, 0))
     search_entry = tk.Entry(root_window, textvariable=search_var, width=40,
@@ -1178,69 +1152,44 @@ def open_search_car_form(root_window):
 
     load_all_cars()
 
-# ============================================================
-# UPDATE CAR (multi-step) - uses field()
-# ============================================================
+
 def open_update_car_screen(root, show_menu_callback):
+
     root.title("Update Car Details")
     root.geometry("700x650")
+
     for widget in root.winfo_children():
         widget.destroy()
 
     create_banner(root, "Update Car Details")
 
+    current_step = {"value": 0}
     car_id_var = tk.StringVar()
-    tk.Label(root, text="Enter Car ID to Load", bg=THEME["bg_main"]).pack(pady=5)
-    tk.Entry(root, textvariable=car_id_var, width=30, bg=THEME["field_bg"], fg=THEME["field_fg"]).pack(pady=5)
-    tk.Button(root, text="Load Car", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"],
-              command=lambda: load_car(car_id_var.get())).pack(pady=5)
-
-    # --- Scrollable Frame ---
-    container = tk.Frame(root, bg=THEME["bg_main"])
-    container.pack(fill="both", expand=True)
-
-    canvas = tk.Canvas(container, bg=THEME["bg_main"])
-    canvas.pack(side="left", fill="both", expand=True)
-
-    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-    scrollbar.pack(side="right", fill="y")
-    canvas.configure(yscrollcommand=scrollbar.set)
-
-    scroll_frame = tk.Frame(canvas, bg=THEME["bg_main"])
-    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
-
-    def on_frame_configure(event):
-        canvas.configure(scrollregion=canvas.bbox("all"))
-
-    scroll_frame.bind("<Configure>", on_frame_configure)
-    def _on_mousewheel(event):
-        canvas.yview_scroll(-1 * int(event.delta / 120), "units")
-    canvas.bind_all("<MouseWheel>", _on_mousewheel)
-
     entries = {}
+
     sections = {
         "Basic Info": ["Car Name", "Brand", "Model Year", "Fuel Type", "Transmission", "Color"],
         "Status & Technical": ["Availability", "Mileage", "Condition", "Engine CC", "Horsepower", "Torque", "Seating Capacity"],
         "Owner Info": ["Owner Name", "Phone", "Address", "Ownership Duration"],
-        "Location Info": ["Lot Number", "Storage Facility"]
+        "Location Info": ["Lot Number", "Storage Facility"],
+        "Crash Details": ["Crash Description"]
     }
+    section_keys = list(sections.keys())
 
-    for section_name, fields_list in sections.items():
-        create_banner(scroll_frame, section_name)
-        for field_label in fields_list:
-            # for fields that we want as dropdowns, use widget_type dropdown
-            if field_label in ("Fuel Type",):
-                field(scroll_frame, field_label, "dropdown", options=["Petrol", "Diesel", "Electric", "Hybrid"], entries=entries)
-            elif field_label in ("Transmission",):
-                field(scroll_frame, field_label, "dropdown", options=["Manual", "Automatic"], entries=entries)
-            elif field_label == "Condition":
-                field(scroll_frame, field_label, "dropdown", options=["Excellent", "Good", "Fair", "Poor", "Crashed"], entries=entries)
-            else:
-                field(scroll_frame, field_label, "entry", entries=entries)
-
-    # Crash description area (separate)
-    create_banner(scroll_frame, "Crash Details (if any)")
-    field(scroll_frame, "Crash Description", "text", entries=entries)
+    def set_widget_value(widget, value):
+        if isinstance(widget, tk.Entry):
+            widget.delete(0, tk.END)
+            widget.insert(0, value)
+        elif isinstance(widget, tk.Text):
+            widget.delete("1.0", tk.END)
+            widget.insert(tk.END, value)
+        else:
+            try:
+                widget.set(value)
+            except Exception:
+                if hasattr(widget, "delete"):
+                    widget.delete(0, tk.END)
+                    widget.insert(0, value)
 
     def load_car(car_id):
         car_id = car_id.strip()
@@ -1261,73 +1210,40 @@ def open_update_car_screen(root, show_menu_callback):
 
         for f in sections["Basic Info"]:
             widget = entries.get(f)
-            if widget is None: continue
-            # widget may be Entry or StringVar (combobox uses StringVar)
-            if isinstance(widget, tk.Entry):
-                widget.delete(0, tk.END)
-                widget.insert(0, details.get(f, ""))
-            else:
-                try:
-                    widget.set(details.get(f, ""))
-                except Exception:
-                    # fallback to insert if widget is not a StringVar
-                    if hasattr(widget, "delete"):
-                        widget.delete(0, tk.END); widget.insert(0, details.get(f, ""))
+            if widget:
+                set_widget_value(widget, details.get(f, ""))
 
         for f in ["Availability", "Mileage", "Condition"]:
             widget = entries.get(f)
-            if widget is None: continue
-            val = status.get(f) if status and f in status else ""
-            if isinstance(widget, tk.Entry):
-                widget.delete(0, tk.END); widget.insert(0, val)
-            else:
-                try:
-                    widget.set(val)
-                except Exception:
-                    if hasattr(widget, "delete"):
-                        widget.delete(0, tk.END); widget.insert(0, val)
+            if widget:
+                val = status.get(f) if status and f in status else ""
+                set_widget_value(widget, val)
 
         for f in ["Engine CC", "Horsepower", "Torque", "Seating Capacity"]:
             widget = entries.get(f)
-            val = spec.get(f) if spec and f in spec else ""
-            if isinstance(widget, tk.Entry):
-                widget.delete(0, tk.END); widget.insert(0, val)
-            else:
-                try:
-                    widget.set(val)
-                except Exception:
-                    if hasattr(widget, "delete"):
-                        widget.delete(0, tk.END); widget.insert(0, val)
+            if widget:
+                val = spec.get(f) if spec and f in spec else ""
+                set_widget_value(widget, val)
 
         for f in sections["Owner Info"]:
             widget = entries.get(f)
-            val = owner.get(f, "") if owner else ""
-            if isinstance(widget, tk.Entry):
-                widget.delete(0, tk.END); widget.insert(0, val)
-            else:
-                try:
-                    widget.set(val)
-                except Exception:
-                    if hasattr(widget, "delete"):
-                        widget.delete(0, tk.END); widget.insert(0, val)
+            if widget:
+                val = owner.get(f, "") if owner else ""
+                set_widget_value(widget, val)
 
         for f in sections["Location Info"]:
             widget = entries.get(f)
-            val = loc.get(f, "") if loc else ""
-            if isinstance(widget, tk.Entry):
-                widget.delete(0, tk.END); widget.insert(0, val)
-            else:
-                try:
-                    widget.set(val)
-                except Exception:
-                    if hasattr(widget, "delete"):
-                        widget.delete(0, tk.END); widget.insert(0, val)
+            if widget:
+                val = loc.get(f, "") if loc else ""
+                set_widget_value(widget, val)
 
         if crash:
             txt = entries.get("Crash Description")
-            if isinstance(txt, tk.Text):
-                txt.delete("1.0", tk.END)
-                txt.insert(tk.END, crash.get("Crash Description", ""))
+            if txt:
+                set_widget_value(txt, crash.get("Crash Description", ""))
+
+        show_step(0)
+        messagebox.showinfo("Success", f"Car ID {car_id} loaded successfully!")
 
     def save_updates():
         car_id = car_id_var.get().strip()
@@ -1335,7 +1251,6 @@ def open_update_car_screen(root, show_menu_callback):
             messagebox.showwarning("Warning", "Please enter a Car ID")
             return
 
-        # helper to read widget value
         def read_val(w):
             if isinstance(w, tk.Text):
                 return w.get("1.0", "end").strip()
@@ -1344,14 +1259,16 @@ def open_update_car_screen(root, show_menu_callback):
             elif isinstance(w, tk.StringVar):
                 return w.get()
             else:
-                try: return w.get()
-                except: return ""
+                try:
+                    return w.get()
+                except:
+                    return ""
 
-        updated_details = {f: read_val(entries[f]) for f in sections["Basic Info"]}
-        updated_status = {f: read_val(entries[f]) for f in ["Availability", "Mileage", "Condition"]}
-        updated_spec = {f: read_val(entries[f]) for f in ["Engine CC", "Horsepower", "Torque", "Seating Capacity"]}
-        updated_owner = {f: read_val(entries[f]) for f in sections["Owner Info"]}
-        updated_loc = {f: read_val(entries[f]) for f in sections["Location Info"]}
+        updated_details = {f: read_val(entries[f]) for f in sections["Basic Info"] if f in entries}
+        updated_status = {f: read_val(entries[f]) for f in ["Availability", "Mileage", "Condition"] if f in entries}
+        updated_spec = {f: read_val(entries[f]) for f in ["Engine CC", "Horsepower", "Torque", "Seating Capacity"] if f in entries}
+        updated_owner = {f: read_val(entries[f]) for f in sections["Owner Info"] if f in entries}
+        updated_loc = {f: read_val(entries[f]) for f in sections["Location Info"] if f in entries}
 
         ok1 = update_csv_row(CAR_DETAILS_FILE, "Car ID", car_id, updated_details)
         ok2 = update_csv_row(CAR_STATUS_FILE, "Car ID", car_id, updated_status)
@@ -1359,11 +1276,9 @@ def open_update_car_screen(root, show_menu_callback):
         ok4 = update_csv_row(CAR_OWNERS_FILE, "Car ID", car_id, updated_owner)
         ok5 = update_csv_row(CAR_LOCATION_FILE, "Car ID", car_id, updated_loc)
 
-        # update crash CSV (if exists)
         crash_widget = entries.get("Crash Description")
         crash_text = read_val(crash_widget) if crash_widget is not None else ""
         if crash_text:
-            # if file doesn't have the car id row, attempt to append; otherwise update
             existing = next((r for r in read_csv_file(CAR_CRASH_FILE) if r["Car ID"] == car_id), None)
             if existing:
                 update_csv_row(CAR_CRASH_FILE, "Car ID", car_id, {"Crash Description": crash_text})
@@ -1376,13 +1291,122 @@ def open_update_car_screen(root, show_menu_callback):
         else:
             messagebox.showwarning("Warning", "Some updates may have failed. Check CSVs.")
 
-    tk.Button(scroll_frame, text="Save Updates", bg=THEME["btn_success_bg"], fg=THEME["btn_success_fg"],
-              width=15, command=save_updates).pack(pady=15)
-    tk.Button(scroll_frame, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"],
-              command=show_menu_callback).pack(pady=5)
+    # --- UI layout ---
+    id_frame = tk.Frame(root, bg=THEME["bg_main"])
+    id_frame.pack(pady=10)
 
-# ============================================================
-# START APP
-# ============================================================ 
+    tk.Label(id_frame, text="Enter Car ID to Load", bg=THEME["bg_main"]).pack(side="left", padx=5)
+    tk.Entry(id_frame, textvariable=car_id_var, width=20, bg=THEME["field_bg"], fg=THEME["field_fg"]).pack(side="left", padx=5)
+    tk.Button(
+        id_frame, text="Load Car",
+        bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"],
+        command=lambda: load_car(car_id_var.get())
+    ).pack(side="left", padx=5)
+
+    progress_label = tk.Label(root, text="", bg=THEME["bg_main"], font=("Arial", 10))
+    progress_label.pack(pady=5)
+
+    container = tk.Frame(root, bg=THEME["bg_main"])
+    container.pack(fill="both", expand=True, pady=10)
+
+    canvas = tk.Canvas(container, bg=THEME["bg_main"])
+    canvas.pack(side="left", fill="both", expand=True)
+
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scrollbar.pack(side="right", fill="y")
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    scroll_frame = tk.Frame(canvas, bg=THEME["bg_main"])
+    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    def on_frame_configure(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(-1 * int(event.delta / 120), "units")
+
+    canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    section_frames = {}
+    for section_name, fields_list in sections.items():
+        frame = tk.Frame(scroll_frame, bg=THEME["bg_main"])
+        section_frames[section_name] = frame
+        create_banner(frame, section_name)
+
+        for field_label in fields_list:
+            if field_label in ("Fuel Type",):
+                field(frame, field_label, "dropdown", options=["Petrol", "Diesel", "Electric", "Hybrid"], entries=entries)
+            elif field_label in ("Transmission",):
+                field(frame, field_label, "dropdown", options=["Manual", "Automatic"], entries=entries)
+            elif field_label == "Condition":
+                field(frame, field_label, "dropdown", options=["Excellent", "Good", "Fair", "Poor", "Crashed"], entries=entries)
+            elif field_label == "Crash Description":
+                field(frame, field_label, "text", entries=entries)
+            else:
+                field(frame, field_label, "entry", entries=entries)
+
+    nav_frame = tk.Frame(root, bg=THEME["bg_main"])
+    nav_frame.pack(pady=15)
+
+    prev_btn = tk.Button(
+        nav_frame, text="← Previous",
+        bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], width=12,
+        command=lambda: show_step(current_step["value"] - 1)
+    )
+    prev_btn.pack(side="left", padx=10)
+
+    next_btn = tk.Button(
+        nav_frame, text="Next →",
+        bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], width=12,
+        command=lambda: show_step(current_step["value"] + 1)
+    )
+    next_btn.pack(side="left", padx=10)
+
+    save_btn = tk.Button(
+        nav_frame, text="Save Updates",
+        bg=THEME["btn_success_bg"], fg=THEME["btn_success_fg"], width=15,
+        command=save_updates
+    )
+    save_btn.pack(side="left", padx=10)
+    save_btn.pack_forget()
+
+    back_btn = tk.Button(
+        root, text="Back to Menu",
+        bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"],
+        command=show_menu_callback
+    )
+    back_btn.pack(pady=5)
+
+    def show_step(step):
+        if step < 0 or step >= len(section_keys):
+            return
+
+        current_step["value"] = step
+        for frame in section_frames.values():
+            frame.pack_forget()
+
+        current_section = section_keys[step]
+        section_frames[current_section].pack(fill="both", expand=True)
+        progress_label.config(text=f"Step {step + 1} of {len(section_keys)}: {current_section}")
+
+        if step == 0:
+            prev_btn.config(state="disabled")
+        else:
+            prev_btn.config(state="normal")
+
+        if step == len(section_keys) - 1:
+            next_btn.pack_forget()
+            save_btn.pack(side="left", padx=10)
+        else:
+            save_btn.pack_forget()
+            next_btn.pack(side="left", padx=10)
+
+        canvas.yview_moveto(0)
+
+    show_step(0)
+
 start_app()
 root.mainloop()
