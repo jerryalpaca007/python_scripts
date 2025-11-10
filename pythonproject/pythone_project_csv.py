@@ -9,6 +9,7 @@ THEME = {
     "bg_banner": "#2A6DCB",
     "fg_banner": "white",
     "banner_font": ("Arial", 18, "bold"),
+    "normal_font": ("Arial", 18, "bold"),
 
     "btn_primary_bg": "#2B2D42",
     "btn_primary_fg": "white",
@@ -18,7 +19,7 @@ THEME = {
     "btn_danger_fg": "white",
     "btn_secondary_bg": "#2B2D42",
     "btn_secondary_fg": "white",
-    "btn_neutral_bg": "gray",
+    "btn_neutral_bg": "#34353F",
     "btn_neutral_fg": "white",
 
     "field_bg": "#BDC4CC",
@@ -646,14 +647,9 @@ def create_banner(parent, text):
     return label
 
 def field(frame, label_text, widget_type="entry", options=None, entries=None, show=None):
-    """
-    Create a labeled input widget and store it in entries[label_text] if entries provided.
-    widget_type: 'entry' | 'dropdown' | 'text'
-    show: passthrough to Entry (for passwords), e.g. show="*"
-    """
     tk.Label(frame, text=label_text, bg=THEME["bg_main"], fg=THEME["label_fg"]).pack(anchor="w", padx=5)
     if widget_type == "entry":
-        e = tk.Entry(frame, width=40, bg=THEME["field_bg"], fg=THEME["field_fg"], show=show)
+        e = tk.Entry(frame, width=40, bg=THEME["field_bg"], fg=THEME["field_fg"], show=show ,font=THEME["normal_font"])
         e.pack(pady=3)
         if entries is not None:
             entries[label_text] = e
@@ -707,7 +703,7 @@ def start_app():
     show_login_screen()
 
 root = tk.Tk()
-root.geometry("700x650")
+root.geometry("1920x1080")
 root.config(bg=THEME["bg_main"])
 
 def clear_root():
@@ -724,7 +720,6 @@ def show_login_screen():
     form_frame.place(relx=0.5, rely=0.5, anchor="center")
 
     entries = {}
-
     field(form_frame, "Username", "entry", entries=entries)
     entries["Username"].config(justify="center") 
 
