@@ -6,15 +6,17 @@ import os
 
 THEME = {
     "bg_main": "#8D99AE",
+    "bg_default": "#F6F6F6",
     "bg_banner": "#2A6DCB",
     "fg_banner": "white",
     "banner_font": ("Arial", 18, "bold"),
-    "normal_font": ("Arial", 18, "bold"),
+    "normal_font": ("Arial", 16, "normal"),
+    "normal_font_bold": ("Arial", 18, "bold"),
 
     "btn_primary_bg": "#2B2D42",
     "btn_primary_fg": "white",
-    "btn_success_bg": "#2B2D42",
-    "btn_success_fg": "white",
+    "btn_success_bg": "#2A6DCB",
+    "btn_success_fg": "#FFFFFF",
     "btn_danger_bg": "#EF233C",
     "btn_danger_fg": "white",
     "btn_secondary_bg": "#2B2D42",
@@ -22,11 +24,11 @@ THEME = {
     "btn_neutral_bg": "#34353F",
     "btn_neutral_fg": "white",
 
-    "field_bg": "#BDC4CC",
+    "field_bg": "#f6f6f6",
     "field_fg": "black",
     "label_fg": "black",
 }
-
+APP_TITLE="Car Crash Report"
 CAR_DETAILS_FILE = "car_details.csv"
 CAR_STATUS_FILE = "car_status.csv"
 CAR_SPEC_FILE = "car_specifications.csv"
@@ -646,25 +648,56 @@ def create_banner(parent, text):
     label.pack(padx=5, pady=5)
     return label
 
+def create_panel_right(parent):
+    frame = tk.Frame(parent,width=400, height=400, bg=THEME["bg_default"], bd=0, highlightbackground="#000000",highlightthickness=0)
+    frame.pack(side="right")
+    entries = {}
+    field(frame, "Username", "entry", entries=entries).config(justify="left")
+    entries["Username"].config(justify="left") 
+
+    field(frame, "Password", "entry", entries=entries, show="*").config(justify="left")
+    entries["Password"].config(justify="left")
+
+    # for widget in parent.winfo_children():
+    #     if isinstance(widget, tk.Label):
+    #         widget.config(fg="white", bg=THEME["bg_main"], font=("Arial", 12, "bold"))
+
+    tk.Button(frame, text="Login", bg=THEME["btn_success_bg"],
+        fg=THEME["btn_success_fg"], font=("Arial", 16, "bold"),
+        width=15, height=1, command=lambda: login(entries)).pack(ipady=6, pady=10)
+
+    tk.Button(frame, text="Register", bg=THEME["btn_primary_bg"],
+        fg=THEME["btn_primary_fg"], font=("Arial", 16, "bold"),
+        width=15, height=1, command=open_register_screen).pack(ipady=6)
+    
+def create_panel_left(parent):
+    frame_right = tk.Frame(parent ,width=400,height=400, bg=THEME["bg_banner"], bd=1,highlightbackground="#000000",highlightthickness=0)
+    frame_right.pack(side="left")
+
+def create_spacer(parent):
+    # Spacer (20 pixels wide)
+    spacer = tk.Frame(parent, width=20, bg="#dddddd")
+    spacer.pack(side="left")
+
 def field(frame, label_text, widget_type="entry", options=None, entries=None, show=None):
-    tk.Label(frame, text=label_text, bg=THEME["bg_main"], fg=THEME["label_fg"]).pack(anchor="w", padx=5)
+    tk.Label(frame, text=label_text, bg=THEME["bg_default"], fg=THEME["label_fg"], font=THEME["normal_font_bold"]).pack(anchor="w", padx=20)
     if widget_type == "entry":
-        e = tk.Entry(frame, width=40, bg=THEME["field_bg"], fg=THEME["field_fg"], show=show ,font=THEME["normal_font"])
-        e.pack(pady=3)
+        e = tk.Entry(frame, width=30, bg=THEME["field_bg"], fg=THEME["field_fg"], show=show ,font=THEME["normal_font"])
+        e.pack(pady=10, padx=20)
         if entries is not None:
             entries[label_text] = e
         return e
     elif widget_type == "dropdown":
         var = tk.StringVar()
-        dropdown = ttk.Combobox(frame, textvariable=var, values=options or [], state="readonly", width=38)
-        dropdown.pack(pady=3)
+        dropdown = ttk.Combobox(frame, textvariable=var, values=options or [], state="readonly", width=30, font=THEME["normal_font"])
+        dropdown.pack(pady=10)
         if options:
             dropdown.current(0)
         if entries is not None:
             entries[label_text] = var
         return var
     elif widget_type == "text":
-        txt = tk.Text(frame, width=60, height=5, bg=THEME["field_bg"], fg=THEME["field_fg"])
+        txt = tk.Text(frame, width=30, height=10, bg=THEME["bg_default"], fg=THEME["field_fg"], font=THEME["normal_font"])
         txt.pack(pady=3)
         if entries is not None:
             entries[label_text] = txt
@@ -700,7 +733,8 @@ def start_app():
     if not os.path.exists(CAR_DETAILS_FILE):
         if messagebox.askyesno("Add Default Data?", "Do you want to add default car details?"):
             initialize_csvs()
-    show_login_screen()
+    #show_login_screen()
+    open_car_details_popup(99)
 
 root = tk.Tk()
 root.geometry("1920x1080")
@@ -712,47 +746,41 @@ def clear_root():
 
 def show_login_screen():
     clear_root()
-    root.title("Login")
+    root.title(APP_TITLE)
 
-    create_banner(root, "Car Status / Accident Report Login")
+    #create_banner(root, "Login")
 
-    form_frame = tk.Frame(root, bg=THEME["bg_main"])
+    form_frame = tk.Frame(root, height=500, width=800, bg=THEME["bg_default"],bd=1,highlightbackground="#000000",highlightthickness=2)
     form_frame.place(relx=0.5, rely=0.5, anchor="center")
+    #form_frame.pack(fill="both", expand=True, padx=20, pady=20)
 
-    entries = {}
-    field(form_frame, "Username", "entry", entries=entries)
-    entries["Username"].config(justify="center") 
+    create_panel_left(form_frame)
+    # create_spacer(form_frame)
+    create_panel_right(form_frame)
 
-    field(form_frame, "Password", "entry", entries=entries, show="*")
-    entries["Password"].config(justify="center")
+   
 
-    for widget in form_frame.winfo_children():
-        if isinstance(widget, tk.Label):
-            widget.config(fg="white", bg=THEME["bg_main"], font=("Arial", 12, "bold"))
 
-  
-    def login():
-        users = read_csv_file(LOGIN_FILE)
-        for user in users:
-            if (user["Username"] == entries["Username"].get() and
-                user["Password"] == entries["Password"].get()):
-                messagebox.showinfo("Login Successful", f"Welcome, {entries['Username'].get()}!")
-                show_menu_screen()
-                return
-        messagebox.showerror("Error", "Invalid username or password.")
-
-    def open_register_screen():
+def open_register_screen():
         clear_root()
-        root.title("Register")
-        create_banner(root, "Register New User")
-        reg_entries = {}
-        field(root, "New Username", "entry", entries=reg_entries)
-        field(root, "New Password", "entry", entries=reg_entries, show="*")
+        root.title(APP_TITLE)
+        
+        container = tk.Frame(root)
+        container.pack(fill="both", expand=True)
+        create_banner(container, "Register New User")
 
-       
-        for widget in root.winfo_children():
-            if isinstance(widget, tk.Label):
-                widget.config(fg="white", bg=THEME["bg_main"], font=("Arial", 12, "bold"))
+
+        frame_register = tk.Frame(container, bg=THEME["bg_default"], bd=1, highlightbackground="#000000", highlightthickness=1)
+        frame_register.place(relx=0.5, rely=0.5, anchor="center", width=400, height=400)
+
+        reg_entries = {}
+        tk.Label(frame_register, text="", bg=THEME["bg_default"]).pack(pady=14)
+        field(frame_register, "New Username", "entry", entries=reg_entries)
+        field(frame_register, "New Password", "entry", entries=reg_entries, show="*")
+
+        # for widget in root.winfo_children():
+        #     if isinstance(widget, tk.Label):
+        #         widget.config(fg="white", bg=THEME["bg_main"], font=("Arial", 12, "bold"))
 
         def register_user():
             if not reg_entries["New Username"].get() or not reg_entries["New Password"].get():
@@ -769,29 +797,38 @@ def show_login_screen():
             })
             messagebox.showinfo("Success", "User registered successfully!")
             show_login_screen()
-
-        tk.Button(root, text="Register", bg=THEME["btn_success_bg"],
-                  fg=THEME["btn_success_fg"], width=15,
+        button_style = {
+            "width": 22,
+            "height": 2,
+            "font": ("Arial", 18, "bold")
+    }
+        tk.Button(frame_register, text="Register", bg=THEME["btn_success_bg"],
+                  fg=THEME["btn_success_fg"], **button_style,
                   command=register_user).pack(pady=10)
 
-        tk.Button(root, text="Back", bg=THEME["btn_neutral_bg"],
-                  fg=THEME["btn_neutral_fg"], width=15,
-                  command=show_login_screen).pack(pady=5)
+        tk.Button(frame_register, text="Back", bg=THEME["btn_neutral_bg"],
+                  fg=THEME["btn_neutral_fg"], **button_style,
+                  command=show_login_screen).pack(pady=10)
 
-
-    tk.Button(form_frame, text="Login", bg=THEME["btn_success_bg"],
-              fg=THEME["btn_success_fg"], font=("Arial", 10, "bold"),
-              width=15, command=login).pack(pady=10)
-
-    tk.Button(form_frame, text="Register", bg=THEME["btn_primary_bg"],
-              fg=THEME["btn_primary_fg"], font=("Arial", 10, "bold"),
-              width=15, command=open_register_screen).pack(pady=5)
+def login(entries):
+    users = read_csv_file(LOGIN_FILE)
+    for user in users:
+        if (user["Username"] == entries["Username"].get() and
+            user["Password"] == entries["Password"].get()):
+            messagebox.showinfo("Login Successful", f"Welcome, {entries['Username'].get()}!")
+            show_menu_screen()
+            return
+        else:
+            messagebox.showerror("Error", "Invalid username or password. OK")
+            return
+    
+   
 
 
 def show_menu_screen():
     clear_root()
-    root.title("Main Menu")
-    create_banner(root, "Car Status / Accident Report")
+    root.title(APP_TITLE)
+    create_banner(root, "Select your Action!")
 
     menu_frame = tk.Frame(root, bg=THEME["bg_main"])
     menu_frame.place(relx=0.5, rely=0.5, anchor="center")
@@ -800,7 +837,7 @@ def show_menu_screen():
     button_style = {
         "width": 22,
         "height": 2,
-        "font": ("Arial", 12, "bold")
+        "font": ("Arial", 18, "bold")
     }
 
  
@@ -830,11 +867,9 @@ def show_menu_screen():
         **button_style, command=show_login_screen
     ).pack(pady=10)
 
-    
-
 def open_add_car_screen():
     clear_root()
-    root.title("Add Car Details")
+    root.title(APP_TITLE)
 
     entries = {}
     all_cars = read_csv_file(CAR_DETAILS_FILE)
@@ -843,26 +878,41 @@ def open_add_car_screen():
     frames = {}
     def show_frame(name):
         for f in frames.values():
-            f.pack_forget()
-        frames[name].pack(fill="both", expand=True)
+        #     f.pack_forget()
+            #f.grid(row=0, column=0, sticky="nsew")
+            f.place(relx=0.5, rely=0.5, anchor="center", width=400, height=800)
+        frames[name].tkraise()
+        
+    container = tk.Frame(root)
+    container.pack(fill="both", expand=True)
 
+    frame_basic = tk.Frame(container, bg=THEME["bg_default"], bd=1, highlightbackground="#000000", highlightthickness=3)
+    #frame_basic.place(relx=0.5, rely=0.5, anchor="center")
 
-    frame_basic = tk.Frame(root, bg=THEME["bg_main"])
     frames["basic"] = frame_basic
     create_banner(frame_basic, f"Add New Car (Vin ID: {next_car_id})")
 
     for name in ["Car Name", "Brand", "Model Year"]:
         field(frame_basic, name, "entry", entries=entries)
+    
     field(frame_basic, "Fuel Type", "dropdown", options=["Petrol", "Diesel", "Electric", "Hybrid"], entries=entries)
     field(frame_basic, "Transmission", "dropdown", options=["Manual", "Automatic"], entries=entries)
     field(frame_basic, "Color", "entry", entries=entries)
+    
+    button_style = {
+        "width": 22,
+        "height": 2,
+        "font": ("Arial", 18, "bold")
+    }
+    tk.Button(frame_basic, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], **button_style,
+              command=lambda: show_frame("status")).pack(pady=6)
+    tk.Button(frame_basic, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=show_menu_screen).pack(pady=6)
 
-    tk.Button(frame_basic, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], width=15,
-              command=lambda: show_frame("status")).pack(pady=15)
-    tk.Button(frame_basic, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
 
+    frame_status = tk.Frame(container, bg=THEME["bg_default"], bd=1, highlightbackground="#000000", highlightthickness=3)
+    # frame_status.place(relx=0.5, rely=0.5, anchor="center")
 
-    frame_status = tk.Frame(root, bg=THEME["bg_main"])
     frames["status"] = frame_status
     create_banner(frame_status, "Status & Technical Details")
 
@@ -886,32 +936,40 @@ def open_add_car_screen():
         else:
             show_frame("owner")
 
-    tk.Button(frame_status, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], width=15,
-              command=go_next_from_status).pack(pady=15)
-    tk.Button(frame_status, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=lambda: show_frame("basic")).pack()
-    tk.Button(frame_status, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
+    tk.Button(frame_status, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], **button_style,
+              command=go_next_from_status).pack(pady=6)
+    tk.Button(frame_status, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=lambda: show_frame("basic")).pack(pady=6)
+    tk.Button(frame_status, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=show_menu_screen).pack(pady=6)
 
-    frame_crash = tk.Frame(root, bg=THEME["bg_main"])
+    frame_crash = tk.Frame(container, bg=THEME["bg_default"], bd=1, highlightbackground="#000000", highlightthickness=3)
+
     frames["crash"] = frame_crash
     create_banner(frame_crash, "Crash Condition Details")
     field(frame_crash, "Crash Description", "text", entries=entries)  # store Text widget
-    tk.Button(frame_crash, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], width=15,
-              command=lambda: show_frame("owner")).pack(pady=15)
-    tk.Button(frame_crash, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=lambda: show_frame("status")).pack()
-    tk.Button(frame_crash, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
+    tk.Button(frame_crash, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], **button_style,
+              command=lambda: show_frame("owner")).pack(padx=6)
+    tk.Button(frame_crash, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=lambda: show_frame("status")).pack(padx=6)
+    tk.Button(frame_crash, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=show_menu_screen).pack(padx=6)
 
-    frame_owner = tk.Frame(root, bg=THEME["bg_main"])
+    frame_owner = tk.Frame(container, bg=THEME["bg_default"], bd=1, highlightbackground="#000000", highlightthickness=3)
+   
     frames["owner"] = frame_owner
     create_banner(frame_owner, "Previous Owner Details")
     for f in ["Owner Name", "Phone", "Address", "Ownership Duration"]:
         field(frame_owner, f, "entry", entries=entries)
-    tk.Button(frame_owner, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], width=15,
-              command=lambda: show_frame("storage")).pack(pady=15)
-    tk.Button(frame_owner, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=lambda: show_frame("status")).pack()
-    tk.Button(frame_owner, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
+    tk.Button(frame_owner, text="Next", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], **button_style,
+              command=lambda: show_frame("storage")).pack(pady=6)
+    tk.Button(frame_owner, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=lambda: show_frame("status")).pack(pady=6)
+    tk.Button(frame_owner, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=show_menu_screen).pack(pady=6)
 
+    frame_storage = tk.Frame(container, bg=THEME["bg_default"], bd=1, highlightbackground="#000000", highlightthickness=3)
 
-    frame_storage = tk.Frame(root, bg=THEME["bg_main"])
     frames["storage"] = frame_storage
     create_banner(frame_storage, "Car Storage / Location")
     for f in ["Lot Number", "Storage Facility"]:
@@ -956,9 +1014,12 @@ def open_add_car_screen():
         messagebox.showinfo("Success", f"Car ID {car_id} added successfully!")
         show_menu_screen()
 
-    tk.Button(frame_storage, text="Add Car", bg=THEME["btn_success_bg"], fg=THEME["btn_success_fg"], width=15, command=save_car).pack(pady=15)
-    tk.Button(frame_storage, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=lambda: show_frame("owner")).pack()
-    tk.Button(frame_storage, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], command=show_menu_screen).pack(pady=5)
+    tk.Button(frame_storage, text="Add Car", bg=THEME["btn_success_bg"], fg=THEME["btn_success_fg"], **button_style, 
+              command=save_car).pack(pady=6)
+    tk.Button(frame_storage, text="Back", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=lambda: show_frame("owner")).pack(pady=6)
+    tk.Button(frame_storage, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
+              command=show_menu_screen).pack(pady=6)
 
     show_frame("basic")
 
@@ -966,23 +1027,23 @@ def open_add_car_screen():
 def open_car_details_popup(car_id):
     car_id = str(car_id)
     win = tk.Toplevel(root)
-    win.title("Car Details")
+    win.title(APP_TITLE)
     win.geometry("520x700")
     win.config(bg=THEME["bg_main"])
 
     def section_title(parent, text):
-        tk.Label(parent, text=text, font=("Arial", 14, "bold"),
+        tk.Label(parent, text=text, font=THEME["normal_font_bold"],
                  bg="#e6f7ff", anchor="w", padx=10).pack(fill="x", pady=(15, 5))
 
     details = next((c for c in read_csv_file(CAR_DETAILS_FILE) if c["Car ID"] == car_id), None)
     if not details:
-        tk.Label(win, text="Car not found.", font=("Arial", 12)).pack(pady=30)
+        tk.Label(win, text="Car not found.", font=THEME["normal_font_bold"]).pack(pady=30)
         return
 
     brand = details.get("Brand", "Unknown Brand")
     banner = tk.Frame(win, bg=THEME["bg_banner"])
     banner.pack(fill="x")
-    tk.Label(banner, text=f"{brand} — Vin ID: {car_id}",
+    tk.Label(banner, text=f"{brand} {details['Car Name']} — Vin ID: {car_id}",
              font=THEME["banner_font"], bg=THEME["bg_banner"], fg=THEME["fg_banner"],
              pady=10).pack(fill="x")
 
@@ -1011,7 +1072,7 @@ def open_car_details_popup(car_id):
                    f"Fuel Type: {details.get('Fuel Type','')}\n"
                    f"Transmission: {details.get('Transmission','')}\n"
                    f"Color: {details.get('Color','')}"),
-             bg=THEME["bg_main"], font=("Arial", 12), justify="left").pack(anchor="w", padx=20)
+             bg=THEME["bg_main"], font=THEME["normal_font"], justify="left").pack(anchor="w", padx=20)
 
 
     if status:
@@ -1020,25 +1081,30 @@ def open_car_details_popup(car_id):
                  text=(f"Availability: {status.get('Availability','')}\n"
                        f"Mileage: {status.get('Mileage','')} km\n"
                        f"Condition: {status.get('Condition','')}"),
-                 bg=THEME["bg_main"], font=("Arial", 12), justify="left").pack(anchor="w", padx=20)
+                 bg=THEME["bg_main"], font=THEME["normal_font"], justify="left").pack(anchor="w", padx=20)
 
         if status.get('Condition','').lower() == "crashed":
             def show_damage_details():
                 dmg = get_car_damage(car_id)
                 dmg_win = tk.Toplevel(win)
-                dmg_win.title("Damage Details")
+                dmg_win.title(APP_TITLE)
                 dmg_win.geometry("500x300")
                 dmg_win.config(bg=THEME["bg_main"])
                 tk.Label(dmg_win, text=f"Damage Report — Car ID {car_id}",
-                         font=("Arial", 14, "bold"), bg=THEME["bg_banner"], fg=THEME["fg_banner"]).pack(fill="x", pady=(0, 10))
+                         font=THEME["normal_font"], bg=THEME["bg_banner"], fg=THEME["fg_banner"]).pack(fill="x", pady=(0, 10))
                 if not dmg:
-                    tk.Label(dmg_win, text="No damage details found for this car.", font=("Arial", 12),
+                    tk.Label(dmg_win, text="No damage details found for this car.", font=THEME["normal_font"],
                              bg=THEME["bg_main"]).pack(pady=40)
                 else:
                     tk.Label(dmg_win, text=f"Damaged Parts:\n{dmg.get('Damaged Parts','')}",
-                             font=("Arial", 12), bg=THEME["bg_main"], justify="left", wraplength=460).pack(padx=20, pady=10)
+                             font=THEME["normal_font"], bg=THEME["bg_main"], justify="left", wraplength=460).pack(padx=20, pady=10)
+            button_style = {
+        "width": 22,
+        "height": 2,
+        "font": ("Arial", 18, "bold")
+    }
             tk.Button(scroll_frame, text="View Damage Details", bg=THEME["btn_danger_bg"],
-                      fg=THEME["btn_danger_fg"], width=25, command=show_damage_details).pack(pady=10)
+                      fg=THEME["btn_danger_fg"], **button_style, command=show_damage_details).pack(pady=10)
 
 
     if spec:
@@ -1048,32 +1114,43 @@ def open_car_details_popup(car_id):
                        f"Horsepower: {spec.get('Horsepower','')}\n"
                        f"Torque: {spec.get('Torque','')}\n"
                        f"Seating Capacity: {spec.get('Seating Capacity','')}"),
-                 bg=THEME["bg_main"], font=("Arial", 12), justify="left").pack(anchor="w", padx=20)
+                 bg=THEME["bg_main"], font=THEME["normal_font"], justify="left").pack(anchor="w", padx=20)
 
 
     def show_owner_details():
         owner_win = tk.Toplevel(win)
-        owner_win.title("Previous Owners")
+        owner_win.title(APP_TITLE)
         owner_win.geometry("480x300")
         owner_win.config(bg=THEME["bg_main"])
         create_banner(owner_win, "Previous Owners")
         if not owner:
             tk.Label(owner_win, text="No previous owners found.", bg=THEME["bg_main"],
-                     font=("Arial", 12)).pack(pady=30); return
+                     font=THEME["normal_font"]).pack(pady=30); return
         cols = ["Owner Name", "Phone", "Address", "Ownership Duration"]
         tree2 = ttk.Treeview(owner_win, columns=cols, show="headings", height=8)
+        style = ttk.Style(owner_win)
+        style.configure("Treeview", 
+                font=THEME["normal_font"],
+                rowheight=25) 
+        style.configure("Treeview.Heading", 
+                font=THEME["normal_font_bold"],
+                rowheight=25) 
         for col in cols:
             tree2.heading(col, text=col); tree2.column(col, width=110)
         for o in owner:
             tree2.insert("", tk.END, values=[o.get(c, "") for c in cols])
         tree2.pack(expand=True, fill=tk.BOTH, padx=10, pady=10)
-
+    button_style = {
+        "width": 22,
+        "height": 2,
+        "font": ("Arial", 18, "bold")
+    }
     tk.Button(scroll_frame, text="View Previous Owners", bg=THEME["bg_banner"], fg=THEME["fg_banner"],
-              width=25, command=show_owner_details).pack(pady=10)
+              **button_style, command=show_owner_details).pack(pady=10)
 
     def show_location():
         loc_win = tk.Toplevel(win)
-        loc_win.title("Car Location")
+        loc_win.title(APP_TITLE)
         loc_win.geometry("400x220")
         loc_win.config(bg=THEME["bg_main"])
         create_banner(loc_win, "Storage Location")
@@ -1081,24 +1158,28 @@ def open_car_details_popup(car_id):
             tk.Label(loc_win, text="Location details not found.", font=("Arial", 12), bg=THEME["bg_main"]).pack(pady=40)
         else:
             tk.Label(loc_win, text=f"Lot Number: {loc.get('Lot Number','')}\nStorage Facility: {loc.get('Storage Facility','')}",
-                     font=("Arial", 12), bg=THEME["bg_main"], justify="left").pack(pady=20)
-
+                     font=THEME["normal_font"], bg=THEME["bg_main"], justify="left").pack(pady=20)
+    button_style = {
+        "width": 22,
+        "height": 2,
+        "font": ("Arial", 18, "bold")
+    }
     tk.Button(scroll_frame, text="View Location", bg=THEME["btn_secondary_bg"], fg=THEME["btn_secondary_fg"],
-              width=25, command=show_location).pack(pady=5)
+              **button_style, command=show_location).pack(pady=5)
 
-    tk.Button(scroll_frame, text="Close", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], width=25,
+    tk.Button(scroll_frame, text="Close", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
               command=win.destroy).pack(pady=15)
 
 
 def open_search_car_form(root_window):
     clear_root()
-    root_window.title("Search Car Details")
-    create_banner(root_window, "Search Screen")
+    root_window.title(APP_TITLE)
+    create_banner(root_window, "Car Search")
 
 
     search_var = tk.StringVar()
-    tk.Label(root_window, text="Search:", bg=THEME["bg_main"], fg=THEME["label_fg"]).pack(pady=(8, 0))
-    search_entry = tk.Entry(root_window, textvariable=search_var, width=40,
+    tk.Label(root_window, text="Search by VIN / Brand / Car Name:", bg=THEME["bg_main"], fg=THEME["label_fg"], font=THEME["normal_font"]).pack(pady=(8, 0))
+    search_entry = tk.Entry(root_window, textvariable=search_var, width=30,
                             bg=THEME["field_bg"], fg=THEME["field_fg"])
     search_entry.pack(pady=5)
 
@@ -1139,19 +1220,25 @@ def open_search_car_form(root_window):
             messagebox.showwarning("No Selection", "Please select a car from the list."); return
         car_data = tree.item(selected[0], "values")
         open_car_details_popup(car_data[0])
+    
+    button_style = {
+        "width": 22,
+        "height": 2,
+        "font": ("Arial", 18, "bold")
+    }
 
     tk.Button(root_window, text="View Selected Car", bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"],
-              command=view_selected_car).pack(pady=5)
+              **button_style, command=view_selected_car).pack(pady=5)
     tk.Button(root_window, text="Back to Menu", bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"],
-              command=show_menu_screen).pack(pady=5)
+              **button_style, command=show_menu_screen).pack(pady=5)
 
     load_all_cars()
 
 
 def open_update_car_screen(root, show_menu_callback):
 
-    root.title("Update Car Details")
-    root.geometry("700x650")
+    root.title(APP_TITLE)
+    root.geometry("1920x1080")
 
     for widget in root.winfo_children():
         widget.destroy()
@@ -1189,7 +1276,7 @@ def open_update_car_screen(root, show_menu_callback):
     def load_car(car_id):
         car_id = car_id.strip()
         if not car_id:
-            messagebox.showwarning("Warning", "Please enter a Car ID")
+            messagebox.showwarning("Warning", "Please enter a Car ID!")
             return
 
         details = next((c for c in read_csv_file(CAR_DETAILS_FILE) if c["Car ID"] == car_id), None)
@@ -1290,15 +1377,25 @@ def open_update_car_screen(root, show_menu_callback):
     id_frame = tk.Frame(root, bg=THEME["bg_main"])
     id_frame.pack(pady=10)
 
-    tk.Label(id_frame, text="Enter Car ID to Load", bg=THEME["bg_main"]).pack(side="left", padx=5)
-    tk.Entry(id_frame, textvariable=car_id_var, width=20, bg=THEME["field_bg"], fg=THEME["field_fg"]).pack(side="left", padx=5)
+    tk.Label(id_frame, text="Enter Car ID to load: ", bg=THEME["bg_main"], font=THEME["normal_font_bold"]).pack(side="left", padx=5)
+    tk.Entry(id_frame, textvariable=car_id_var, width=26, bg=THEME["field_bg"], fg=THEME["field_fg"]).pack(side="left", padx=5)
+    load_button_style = {
+        "width": 22,
+        "height": 1,
+        "font": ("Arial", 18, "bold")
+    }
+    button_style = {
+        "width": 18,
+        "height": 2,
+        "font": ("Arial", 18, "bold")
+    }
     tk.Button(
         id_frame, text="Load Car",
-        bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"],
+        bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], **load_button_style,
         command=lambda: load_car(car_id_var.get())
     ).pack(side="left", padx=5)
 
-    progress_label = tk.Label(root, text="", bg=THEME["bg_main"], font=("Arial", 10))
+    progress_label = tk.Label(root, text="", bg=THEME["bg_main"], font=("Arial", 16))
     progress_label.pack(pady=5)
 
     container = tk.Frame(root, bg=THEME["bg_main"])
@@ -1327,7 +1424,7 @@ def open_update_car_screen(root, show_menu_callback):
 
     section_frames = {}
     for section_name, fields_list in sections.items():
-        frame = tk.Frame(scroll_frame, bg=THEME["bg_main"])
+        frame = tk.Frame(scroll_frame, bg=THEME["bg_default"])
         section_frames[section_name] = frame
         create_banner(frame, section_name)
 
@@ -1348,21 +1445,21 @@ def open_update_car_screen(root, show_menu_callback):
 
     prev_btn = tk.Button(
         nav_frame, text="← Previous",
-        bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], width=12,
+        bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
         command=lambda: show_step(current_step["value"] - 1)
     )
     prev_btn.pack(side="left", padx=10)
 
     next_btn = tk.Button(
         nav_frame, text="Next →",
-        bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], width=12,
+        bg=THEME["btn_primary_bg"], fg=THEME["btn_primary_fg"], **button_style,
         command=lambda: show_step(current_step["value"] + 1)
     )
     next_btn.pack(side="left", padx=10)
 
     save_btn = tk.Button(
         nav_frame, text="Save Updates",
-        bg=THEME["btn_success_bg"], fg=THEME["btn_success_fg"], width=15,
+        bg=THEME["btn_success_bg"], fg=THEME["btn_success_fg"], **button_style,
         command=save_updates
     )
     save_btn.pack(side="left", padx=10)
@@ -1370,7 +1467,7 @@ def open_update_car_screen(root, show_menu_callback):
 
     back_btn = tk.Button(
         root, text="Back to Menu",
-        bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"],
+        bg=THEME["btn_neutral_bg"], fg=THEME["btn_neutral_fg"], **button_style,
         command=show_menu_callback
     )
     back_btn.pack(pady=5)
